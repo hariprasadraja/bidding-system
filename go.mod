@@ -1,3 +1,14 @@
-module github.com/YOUR-USER-OR-ORG-NAME/YOUR-REPO-NAME
+module sellerapp-bidding-system
 
-go 1.14
+go 1.15
+
+require (
+	github.com/julienschmidt/httprouter v1.3.0
+	github.com/micro/go-micro v1.18.0
+	github.com/micro/go-micro/v2 v2.9.1
+	github.com/micro/go-plugins/server/http v0.0.0-20200119172437-4fe21aa238fd
+	github.com/micro/go-plugins/server/http/v2 v2.9.1
+	github.com/mitchellh/go-homedir v1.1.0
+	github.com/spf13/cobra v1.0.0
+	github.com/spf13/viper v1.7.1
+)
