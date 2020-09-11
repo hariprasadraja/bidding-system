@@ -17,27 +17,61 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"sellerapp-bidding-system/internal/app/sellerapp/auction"
 
+	"github.com/julienschmidt/httprouter"
+	"github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2/server"
+	httpServer "github.com/micro/go-plugins/server/http/v2"
 	"github.com/spf13/cobra"
 )
 
 // auctionCmd represents the auction command
 var auctionCmd = &cobra.Command{
 	Use:   "auction",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "start a new micro service to provide auction apis",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("auction called")
+		srv := httpServer.NewServer(
+			server.Name("micro.sellerapp.auction"),
+			server.Version("1.0"),
+		)
+
+		router := httprouter.New()
+		auction.AddRoutes(router)
+
+		// mux := http.NewServeMux()
+		// mux.
+		// 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// 	w.Write([]byte(`hello world`))
+		// })
+
+		hd := srv.NewHandler(router)
+
+		err := srv.Handle(hd)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		service := micro.NewService(
+			micro.Name("micro.sellerapp"),
+			micro.Server(srv),
+		)
+
+		service.Init()
+		err = service.Run()
+		if err != nil {
+			log.Println(err)
+		}
+
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(auctionCmd)
+	serviceCmd.AddCommand(auctionCmd)
 
 	// Here you will define your flags and configuration settings.
 
