@@ -3,9 +3,12 @@ module sellerapp-bidding-system
 go 1.14
 
 require (
+	github.com/Masterminds/squirrel v1.4.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-delve/delve v1.5.0
 	github.com/go-sql-driver/mysql v1.4.0
 	github.com/golang/protobuf v1.4.0
+	github.com/gorilla/securecookie v1.1.1
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/lib/pq v1.3.0

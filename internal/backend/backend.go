@@ -1,7 +1,7 @@
 package backend
 
 import (
-	"os"
+	"context"
 	"sync"
 
 	log "github.com/micro/go-micro/v2/logger"
@@ -23,7 +23,7 @@ var connPool = sync.Pool{
 
 var closeConn bool
 
-func GetConnection() *sqlx.DB {
+func GetConnection(ctx context.Context) *sqlx.DB {
 	if closeConn {
 		return nil
 	}
@@ -31,27 +31,33 @@ func GetConnection() *sqlx.DB {
 	temp := connPool.Get()
 
 	err, ok := temp.(error)
-	if !ok {
+	if ok {
 		log.Errorf("unexpected error while establishing connection: %s", err.Error())
-		os.Exit(1)
+		return nil
 	}
 
 	db, ok := temp.(*sqlx.DB)
 	if !ok {
 		log.Errorf("unexpected error while establishing connection: %s", err.Error())
-		os.Exit(1)
+		return nil
 	}
 
+	err = db.PingContext(ctx)
+	if err != nil {
+		log.Errorf("ping failed. ", err)
+	}
+
+	log.Info("mysql-status ", db.Stats())
 	return db
 }
 
-func PutConnection(db *sqlx.DB) error {
+func PutConnection(db *sqlx.DB) {
 	connPool.Put(db)
-	return nil
+
 }
 
-func CloseConnection() {
+func CloseConnection(ctx context.Context) {
 	closeConn = true
-	db := GetConnection()
+	db := GetConnection(ctx)
 	db.Close()
 }

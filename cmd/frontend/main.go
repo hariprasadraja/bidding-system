@@ -41,8 +41,8 @@ func main() {
 
 	service.Init()
 
-	userClient := user.NewUserService("com.foo.service.user", service.Client())
-	auctionClient := auction.NewAuctionService("com.foo.service.auction", service.Client())
+	userClient := user.NewUserService("go.micro.server.user", service.Client())
+	auctionClient := auction.NewAuctionService("go.micro.server.auction", service.Client())
 	frontend.RegisterUserRoutes(router, userClient)
 	frontend.RegisterAuctionRoutes(router, auctionClient)
 
