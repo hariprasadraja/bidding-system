@@ -4,35 +4,68 @@ package go.micro.service.auction;
 option go_package="./auction";
 
 service Auction {
-	rpc Call(Request) returns (Response) {}
-	rpc Stream(StreamingRequest) returns (stream StreamingResponse) {}
-	rpc PingPong(stream Ping) returns (stream Pong) {}
+	rpc Create(AuctionRequest) returns (Response) {}
+	rpc Update(AuctionRequest) returns (Response) {}
+	rpc Delete(DeleteRequest) returns (Response) {}
+	rpc Get(GetRequest) returns (GetResponse) {}
+	rpc GetLive(NoRequest) returns (All) {}
+	rpc GetAll(NoRequest) returns (All) {}
+	rpc IncreaseBid(Bid) returns(NoResponse) {}
 }
 
-message Message {
-	string say = 1;
+
+message GetResponse {
+	AuctionRequest auction = 1;
+	repeated Bid bids = 2;
 }
 
-message Request {
-	string name = 1;
+message Bid {
+	int64 auction_id = 1;
+	int64 user_id = 2;
+  float bid_amount = 3;
 }
+
+message AuctionRequest {
+	 int64 id = 1;
+	 string name =2;
+   string start_time = 3;
+	 string end_time = 4;
+	 float start_amount = 5;
+	 string currency = 7;
+}
+
 
 message Response {
-	string msg = 1;
+	int64 id = 1;
+	string msg  = 2;
 }
 
-message StreamingRequest {
-	int64 count = 1;
+
+message DeleteRequest{
+int64 id = 1;
 }
 
-message StreamingResponse {
-	int64 count = 1;
+message DeleteResponse{
+int64 id = 1;
+string msg = 2;
 }
 
-message Ping {
-	int64 stroke = 1;
+message GetRequest {
+int64 id = 1;
 }
 
-message Pong {
-	int64 stroke = 1;
+message ExistRequest {
+	 string email = 1;
+	 string password = 2;
 }
+
+message ExistResponse {
+	bool exist = 1;
+}
+
+message All {
+	 repeated GetResponse auctions =1;
+}
+
+message NoResponse {}
+message NoRequest {}

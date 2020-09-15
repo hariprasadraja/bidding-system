@@ -18,7 +18,7 @@ func main() {
 	service.Init()
 
 	// Register Handler
-	auction.RegisterAuctionHandler(service.Server(), new(auction.Auction))
+	auction.RegisterAuctionHandler(service.Server(), new(auction.Handler))
 
 	// Register Struct as Subscriber
 	// micro.RegisterSubscriber("go.micro.service.auction", service.Server(), new(subscriber.Auction))

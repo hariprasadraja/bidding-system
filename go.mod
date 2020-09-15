@@ -21,4 +21,5 @@ require (
 	github.com/spf13/viper v1.7.1
 	google.golang.org/appengine v1.6.1
 	google.golang.org/protobuf v1.22.0
+	gopkg.in/square/go-jose.v2 v2.5.1
 )

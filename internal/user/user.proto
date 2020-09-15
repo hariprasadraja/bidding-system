@@ -48,6 +48,7 @@ string msg = 2;
 
 message GetRequest {
 int64 id = 1;
+string email = 2;
 }
 
 message GetResponse {

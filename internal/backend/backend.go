@@ -47,13 +47,12 @@ func GetConnection(ctx context.Context) *sqlx.DB {
 		log.Errorf("ping failed. ", err)
 	}
 
-	log.Info("mysql-status ", db.Stats())
+	log.Infof("mysql-status %+v", db.Stats())
 	return db
 }
 
 func PutConnection(db *sqlx.DB) {
 	connPool.Put(db)
-
 }
 
 func CloseConnection(ctx context.Context) {

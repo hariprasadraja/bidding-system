@@ -44,7 +44,7 @@ func main() {
 	userClient := user.NewUserService("go.micro.server.user", service.Client())
 	auctionClient := auction.NewAuctionService("go.micro.server.auction", service.Client())
 	frontend.RegisterUserRoutes(router, userClient)
-	frontend.RegisterAuctionRoutes(router, auctionClient)
+	frontend.RegisterAuctionRoutes(router, userClient, auctionClient)
 
 	err = service.Run()
 	if err != nil {

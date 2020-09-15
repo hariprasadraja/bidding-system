@@ -1,16 +1,12 @@
 package frontend
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"sellerapp-bidding-system/internal/model"
 	"sellerapp-bidding-system/internal/user"
 	"strconv"
 	"time"
-
-	"github.com/gorilla/securecookie"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/micro/go-micro/errors"
@@ -28,18 +24,20 @@ func RegisterUserRoutes(router *httprouter.Router, service user.UserService) {
 		userService: service,
 	}
 
-	router.POST("/user", user.Create)
-	router.GET("/user", user.Get)
-	router.PUT("/user", user.Update)
-	router.DELETE("/user", user.Delete)
+	router.POST("/user", user.AllowAdmin(user.Create))
+	router.GET("/user", user.AllowAdmin(user.Get))
+	router.PUT("/user", user.AllowAdmin(user.Update))
+	router.DELETE("/user", user.AllowAdmin(user.Delete))
 	router.POST("/authenticate", user.Authenticate)
 }
 
 type Response struct {
-	Status  string      `json:"status,omitempty"`
-	Message string      `json:"message,omitempty"`
-	Token   string      `json:"token,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
+	ID         int64       `json:"id,omitempty"`
+	StatusText string      `json:"status,omitempty"`
+	Status     int         `json:"-"`
+	Message    string      `json:"message,omitempty"`
+	Token      string      `json:"token,omitempty"`
+	Data       interface{} `json:"data,omitempty"`
 }
 
 func (u User) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
@@ -50,16 +48,12 @@ func (u User) Create(w http.ResponseWriter, r *http.Request, params httprouter.P
 		return
 	}
 
-	log.Info("user_details", userModel)
-
-	enc := sha256.New()
-	_, err = enc.Write([]byte(userModel.Password))
+	userModel.Password, err = OneTimeEnc(userModel.Password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Error("login.password.enc ", err.Error())
 		return
 	}
 
-	userModel.Password = base64.StdEncoding.EncodeToString(enc.Sum(nil))
 	resp, err := u.userService.Create(r.Context(), &user.CreateRequest{
 		Name:     userModel.Name,
 		Email:    userModel.Email,
@@ -74,8 +68,9 @@ func (u User) Create(w http.ResponseWriter, r *http.Request, params httprouter.P
 	}
 
 	RenderJSON(w, Response{
-		Status:  http.StatusText(http.StatusOK),
-		Message: resp.GetMsg(),
+		StatusText: http.StatusText(http.StatusOK),
+		Status:     http.StatusOK,
+		Message:    resp.GetMsg(),
 	})
 }
 
@@ -113,9 +108,10 @@ func (u User) Get(w http.ResponseWriter, r *http.Request, params httprouter.Para
 	}
 
 	RenderJSON(w, Response{
-		Status:  http.StatusText(http.StatusOK),
-		Message: "user retrived successfully.",
-		Data:    user,
+		StatusText: http.StatusText(http.StatusFound),
+		Status:     http.StatusFound,
+		Message:    "user retrived successfully.",
+		Data:       user,
 	})
 
 }
@@ -141,8 +137,9 @@ func (u User) Update(w http.ResponseWriter, r *http.Request, params httprouter.P
 	}
 
 	RenderJSON(w, Response{
-		Status:  http.StatusText(http.StatusOK),
-		Message: resp.GetMsg(),
+		StatusText: http.StatusText(http.StatusOK),
+		Status:     http.StatusOK,
+		Message:    resp.GetMsg(),
 	})
 
 }
@@ -170,8 +167,9 @@ func (u User) Delete(w http.ResponseWriter, r *http.Request, params httprouter.P
 	}
 
 	RenderJSON(w, Response{
-		Status:  http.StatusText(http.StatusOK),
-		Message: resp.GetMsg(),
+		StatusText: http.StatusText(http.StatusOK),
+		Status:     http.StatusOK,
+		Message:    resp.GetMsg(),
 	})
 }
 func (u User) Authenticate(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
@@ -181,7 +179,15 @@ func (u User) Authenticate(w http.ResponseWriter, r *http.Request, params httpro
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	result, err := u.userService.Exist(r.Context(), &user.ExistRequest{
+
+	userModel.Password, err = OneTimeEnc(userModel.Password)
+	if err != nil {
+		log.Error("Authenticate.password.enc ", err.Error())
+		http.Error(w, "sorry, something went wrong.", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = u.userService.Exist(r.Context(), &user.ExistRequest{
 		Email:    userModel.Email,
 		Password: userModel.Password,
 	})
@@ -191,76 +197,39 @@ func (u User) Authenticate(w http.ResponseWriter, r *http.Request, params httpro
 		return
 	}
 
-	if !result.GetExist() {
-		http.Error(w, "invalid email/password", http.StatusNotFound)
+	user, err := u.userService.Get(r.Context(), &user.GetRequest{
+		Email: userModel.Email,
+	})
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	// TODO:  Use redis cache and save `Id` as key and `Audience` as value
-	token := EncJWT(AppJWTClaims{
-		StandardClaims: jwt.StandardClaims{
+	token, err := EncJWT(AppJWTClaims{
+		Role: user.GetRole(),
+		Login: jwt.StandardClaims{
 			Audience:  userModel.Email,
-			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
-			Id:        string(securecookie.GenerateRandomKey(10)),
+			ExpiresAt: time.Now().Add((24 * 30) * time.Hour).Unix(),
+			Id:        string(user.Id),
 			IssuedAt:  time.Now().Unix(),
 			Issuer:    "sellerapp.bidding.backend",
 			Subject:   "login token",
 		},
 	})
 
-	RenderJSON(w, Response{
-		Status:  http.StatusText(http.StatusOK),
-		Message: "loggedIn successfull",
-		Token:   token,
-	})
-}
-
-type AppJWTClaims struct {
-	Auctions []int64 `json:"auctions,omitempty"`
-	jwt.StandardClaims
-}
-
-var secretKey = "yww@y9eNApn4Nsb@Hm4Z3&Uee9zjKJwtVn^%eXdW$Q#igUGvVHNeYh5iEDK!VfhwLSuLVhpHb9vo4uFuuWZm6B4jnTgU6cmefyveF$!2T7PM8^mEnjM9eJ#mAk2amkCK"
-
-// EncryptJwt with a secretKey with claims
-func EncJWT(claims AppJWTClaims) (JWTToken string) {
-	hmac512Algo := jwt.SigningMethodHS512.Alg()
-	signingMethod := jwt.GetSigningMethod(hmac512Algo)
-	token := jwt.New(signingMethod)
-
-	token.Claims = claims
-
-	// Signing and Serialization.
-	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
-		log.Error("Error: ", err)
+		log.Error("authenticate.jwt.error ", err.Error())
+		http.Error(w, "sorry, something went wrong.", http.StatusInternalServerError)
 		return
 	}
 
-	return tokenString
-}
-
-// DecJWT decrypts the JWT token and returns it's claims
-func DecJWT(tokenString string, secretKey []byte) (claims jwt.Claims, err error) {
-	parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if token.Method.Alg() != jwt.SigningMethodHS512.Alg() {
-			return nil, errors.Forbidden("dec.jwt.signing", "Unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return secretKey, nil
+	RenderJSON(w, Response{
+		StatusText: http.StatusText(http.StatusOK),
+		Status:     http.StatusOK,
+		Message:    "loggedIn successfull",
+		Token:      token,
 	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if parsedToken.Valid {
-		if claims, ok := parsedToken.Claims.(AppJWTClaims); ok {
-			return claims, nil
-		}
-	}
-
-	return nil, errors.Forbidden("dec.jwt.invalid", "invalid token in request")
 }
 
 /*

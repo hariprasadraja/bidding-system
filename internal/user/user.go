@@ -70,6 +70,25 @@ func (h *Handler) Update(ctx context.Context, req *UpdateRequest, resp *UpdateRe
 
 func (h *Handler) Get(ctx context.Context, req *GetRequest, resp *GetResponse) error {
 	log.Info(req.String())
+	db := backend.GetConnection(ctx)
+	defer backend.PutConnection(db)
+
+	selectQuery := sq.Select("id,name,role,email").From("User")
+	equal := make(sq.Eq)
+	if req.GetId() != 0 {
+		equal["id"] = req.GetId()
+	}
+
+	if req.GetEmail() != "" {
+		equal["email"] = req.GetEmail()
+	}
+
+	row := selectQuery.Where(equal).RunWith(db).QueryRowContext(ctx)
+	err := row.Scan(&resp.Id, &resp.Name, &resp.Role, &resp.Email)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
