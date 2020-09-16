@@ -9,6 +9,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
+// AppJWTClaims is the jwt token claims for this application
 type AppJWTClaims struct {
 	Role     int32              `json:"role,omitempty"`
 	Auctions jwt.StandardClaims `json:"auctions,omitempty"`
@@ -68,6 +69,7 @@ func DecJWT(JWTToken string) (claims AppJWTClaims, err error) {
 	return claims, nil
 }
 
+// OneTimeEnc creates a hash for the given password text.
 func OneTimeEnc(password string) (string, error) {
 	enc := sha256.New()
 	_, err := enc.Write([]byte(password))

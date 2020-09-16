@@ -14,6 +14,7 @@ import (
 const HeaderAdminID = "X-ADMIN"
 const HeaderAuctionID = "X-AUCTION"
 
+// AllowAdmin middleware allows only the Admin role users to perform operations
 func (u *User) AllowAdmin(next httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		claims, err := GetClaims(r)
@@ -57,6 +58,7 @@ func (u *User) AllowAdmin(next httprouter.Handle) httprouter.Handle {
 	}
 }
 
+// AllowUser will allow model.NormalUser role users to perform API actions.
 func (u *User) AllowUser(next httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		claims, err := GetClaims(r)
@@ -101,6 +103,7 @@ func (u *User) AllowUser(next httprouter.Handle) httprouter.Handle {
 	}
 }
 
+// AllowAuction will allow only the live auction request to perform
 func (u *User) AllowAuction(next httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		claims, err := GetClaims(r)

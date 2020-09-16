@@ -19,6 +19,7 @@ type User struct {
 	userService user.UserService
 }
 
+// RegisterUserRoutes registers the apis for the user service.
 func RegisterUserRoutes(router *httprouter.Router, service user.UserService) {
 	user := User{
 		userService: service,
@@ -31,6 +32,7 @@ func RegisterUserRoutes(router *httprouter.Router, service user.UserService) {
 	router.POST("/authenticate", user.Authenticate)
 }
 
+// Response format used throughout the application.
 type Response struct {
 	ID         int64       `json:"id,omitempty"`
 	StatusText string      `json:"status,omitempty"`
@@ -40,6 +42,7 @@ type Response struct {
 	Data       interface{} `json:"data,omitempty"`
 }
 
+// Create will create a new user
 func (u User) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info("create user called.")
 	userModel := model.User{}
@@ -80,7 +83,7 @@ func (u User) Create(w http.ResponseWriter, r *http.Request, params httprouter.P
 	})
 }
 
-// Get Returns all the users
+// Get return a single user information
 func (u User) Get(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -121,6 +124,8 @@ func (u User) Get(w http.ResponseWriter, r *http.Request, params httprouter.Para
 	})
 
 }
+
+// Update updates an already existing user
 func (u User) Update(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	userModel := model.User{}
 	err := json.NewDecoder(r.Body).Decode(&userModel)
@@ -154,6 +159,8 @@ func (u User) Update(w http.ResponseWriter, r *http.Request, params httprouter.P
 	})
 
 }
+
+// Delete deletes already existing user
 func (u User) Delete(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -183,6 +190,8 @@ func (u User) Delete(w http.ResponseWriter, r *http.Request, params httprouter.P
 		Message:    resp.GetMsg(),
 	})
 }
+
+// Authenticate will authenticate the user and grants JWE access token.
 func (u User) Authenticate(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	userModel := model.User{}
 	err := json.NewDecoder(r.Body).Decode(&userModel)
@@ -262,13 +271,14 @@ Example
 		log.Panicf("Failed to RenderJSON \n ERROR: %s \n Data: %#v \n Length: %v", err, data, dataLen)
 	}
 */
-func RenderJSON(w http.ResponseWriter, data interface{}) {
+func RenderJSON(w http.ResponseWriter, data Response) {
 	js, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
 		log.Error("frontend.user.renderjson", err)
 		return
 	}
 
+	w.WriteHeader(data.Status)
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(js)
 	if err != nil {

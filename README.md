@@ -57,3 +57,7 @@ go build ./cmd/bidding && ./bidding service frontend
 ## Docs
 
 Added Insomnia File in the docs folder. you can open it with Insomnia or using Postman.
+
+## Scripts
+
+/scripts directory has sql script to initialize the database

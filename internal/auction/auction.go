@@ -15,8 +15,14 @@ import (
 
 type Handler struct{}
 
+// TimeFormat to save aution time in the database.
 const TimeFormat = "2006-01-02 15:04:05"
 
+/*
+Create inserts a new auction record into the `Auction` table
+
+It does no validation. you have to send a valid data.
+*/
 func (h *Handler) Create(ctx context.Context, in *AuctionRequest, out *Response) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -37,6 +43,12 @@ func (h *Handler) Create(ctx context.Context, in *AuctionRequest, out *Response)
 	return nil
 }
 
+/*
+Update updateds an already existing auction record into the `Auction` table
+
+It does no validation. you have to send a valid data.
+similar to Create, but `Id` of an existing record is needed.
+*/
 func (h *Handler) Update(ctx context.Context, in *AuctionRequest, out *Response) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -76,6 +88,9 @@ func (h *Handler) Update(ctx context.Context, in *AuctionRequest, out *Response)
 	return err
 }
 
+/*
+Delete deletes an already existing auction record in the `Auction` table
+*/
 func (h *Handler) Delete(ctx context.Context, in *DeleteRequest, out *Response) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -87,6 +102,11 @@ func (h *Handler) Delete(ctx context.Context, in *DeleteRequest, out *Response) 
 	return err
 }
 
+/*
+Get returns a single auction record from the `Auction` table
+
+Id of an auction is required in the input to get the results
+*/
 func (h *Handler) Get(ctx context.Context, in *GetRequest, out *GetResponse) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -127,6 +147,12 @@ func (h *Handler) Get(ctx context.Context, in *GetRequest, out *GetResponse) err
 	return nil
 }
 
+/*
+GetLive will  return all the auction record which are in live state from the `Auction` table
+
+live state refers here is the start_time <= current_time AND end_time >= current_time"
+
+*/
 func (h *Handler) GetLive(ctx context.Context, in *NoRequest, out *All) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -183,6 +209,13 @@ func (h *Handler) GetLive(ctx context.Context, in *NoRequest, out *All) error {
 	return nil
 }
 
+/*
+GetAll will  return all the auction records that are in the `Auction` table
+
+It also do query to the 'Bid' table and get bids record for the auction.
+
+live state refers here is the start_time <= current_time AND end_time >= current_time"
+*/
 func (h *Handler) GetAll(ctx context.Context, in *NoRequest, out *All) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -238,6 +271,11 @@ func (h *Handler) GetAll(ctx context.Context, in *NoRequest, out *All) error {
 	return nil
 }
 
+/*
+IncreaseBid update the `amount` coloumn in the `Bid` table.
+
+A model.User can have only one record for an model.Auction in the `Bid` table
+*/
 func (h *Handler) IncreaseBid(ctx context.Context, in *Bid, out *NoResponse) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -276,6 +314,7 @@ func Close(closer io.Closer) {
 	}
 }
 
+// IsLive checks the given Auction is in live or not
 func (h *Handler) IsLive(ctx context.Context, db *sqlx.DB, auctionID int64) (bool, error) {
 	now := time.Now().UTC().Format(TimeFormat)
 
@@ -294,6 +333,7 @@ func (h *Handler) IsLive(ctx context.Context, db *sqlx.DB, auctionID int64) (boo
 	return true, nil
 }
 
+// GetBids will return the Bids associated with an Auction
 func (h *Handler) GetBids(ctx context.Context, db *sqlx.DB, auctionID int64) ([]*Bid, error) {
 	rows, err := sq.Select("*").From("Bid").Where(sq.Eq{
 		"auction_id": auctionID,

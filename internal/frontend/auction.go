@@ -19,6 +19,7 @@ type Auction struct {
 	UserService    user.UserService
 }
 
+// RegisterAuctionRoutes registers APIs for Auction Service to the router.
 func RegisterAuctionRoutes(router *httprouter.Router, userService user.UserService, auctionService auction.AuctionService) {
 	auction := Auction{
 		AuctionService: auctionService,
@@ -42,6 +43,7 @@ func RegisterAuctionRoutes(router *httprouter.Router, userService user.UserServi
 
 const TimeFormat = "2006-01-02 15:04:05"
 
+// Create creates a new model.Auction
 func (u Auction) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	auctionModel := model.Auction{}
 	err := json.NewDecoder(r.Body).Decode(&auctionModel)
@@ -90,6 +92,7 @@ func (u Auction) Create(w http.ResponseWriter, r *http.Request, params httproute
 
 }
 
+// Update updates an already existing model.Auction
 func (u Auction) Update(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	auctionModel := model.Auction{}
 	err := json.NewDecoder(r.Body).Decode(&auctionModel)
@@ -138,6 +141,7 @@ func (u Auction) Update(w http.ResponseWriter, r *http.Request, params httproute
 	})
 }
 
+// GetAll will return all the auctions available in the system
 func (u Auction) GetAll(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	result, err := u.AuctionService.GetAll(r.Context(), new(auction.NoRequest))
 	if err != nil {
@@ -152,6 +156,8 @@ func (u Auction) GetAll(w http.ResponseWriter, r *http.Request, params httproute
 	})
 
 }
+
+// GetLiveOnly will return Auctions that are currentley in Live
 func (u Auction) GetLiveOnly(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	result, err := u.AuctionService.GetLive(r.Context(), new(auction.NoRequest))
 	if err != nil {
@@ -190,6 +196,8 @@ func (u Auction) Status(w http.ResponseWriter, r *http.Request, params httproute
 		Data:       result,
 	})
 }
+
+// Delete will delete an already existing model.Auction
 func (u Auction) Delete(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	auctionID := params.ByName("id")
 	id, err := strconv.ParseInt(auctionID, 10, 64)
@@ -214,6 +222,8 @@ func (u Auction) Delete(w http.ResponseWriter, r *http.Request, params httproute
 	})
 }
 
+// RequestToJoin creates and ataches an auction token token the user token
+// This allows user to perform various actions related to auction.
 func (u Auction) RequestToJoin(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	auctionIDStr := params.ByName("id")
 	auctionID, err := strconv.ParseInt(auctionIDStr, 10, 64)

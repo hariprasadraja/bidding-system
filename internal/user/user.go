@@ -13,7 +13,7 @@ import (
 
 type Handler struct{}
 
-// PingPong is a bidirectional stream handler called via client.Stream or the generated client code
+// Create creates a new user record into the `User` table
 func (h *Handler) Create(ctx context.Context, req *CreateRequest, resp *CreateResponse) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -44,6 +44,9 @@ func (h *Handler) Create(ctx context.Context, req *CreateRequest, resp *CreateRe
 	return nil
 }
 
+/*
+Update updates an already existing user record into the `User` table
+*/
 func (h *Handler) Update(ctx context.Context, req *UpdateRequest, resp *UpdateResponse) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -68,6 +71,7 @@ func (h *Handler) Update(ctx context.Context, req *UpdateRequest, resp *UpdateRe
 	return nil
 }
 
+// Get will get a user record finding either by using email or id
 func (h *Handler) Get(ctx context.Context, req *GetRequest, resp *GetResponse) error {
 	log.Info(req.String())
 	db := backend.GetConnection(ctx)
@@ -92,6 +96,7 @@ func (h *Handler) Get(ctx context.Context, req *GetRequest, resp *GetResponse) e
 	return nil
 }
 
+// Delete will delete an already existing user record
 func (h *Handler) Delete(ctx context.Context, req *DeleteRequest, resp *DeleteResponse) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
@@ -119,6 +124,7 @@ func (h *Handler) Delete(ctx context.Context, req *DeleteRequest, resp *DeleteRe
 	return nil
 }
 
+// Exist will return all the existing reocrd.
 func (h *Handler) Exist(ctx context.Context, req *ExistRequest, resp *ExistResponse) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
