@@ -34,7 +34,8 @@ micro server
 Hope, you have already taken the build, execute the below command and start the auction micro service.
 
 ``` sh
-protoc --proto_path=.:$GOPATH/src --go_out=./internal --micro_out=./internal internal/auction/auction.proto && go build ./cmd/bidding && ./bidding service auction --config configs/dev.bidding.yaml
+protoc --proto_path=.:$GOPATH/src --go_out=./internal --micro_out=./internal internal/auction/auction.proto && \ 
+./bidding service auction --config configs/dev.bidding.yaml
 ```
 
 #### User Service
@@ -42,7 +43,8 @@ protoc --proto_path=.:$GOPATH/src --go_out=./internal --micro_out=./internal int
 Run the below command to start the User micro service.
 
 ```sh
-protoc --proto_path=.:$GOPATH/src --go_out=./internal --micro_out=./internal internal/user/user.proto && go build ./cmd/bidding && ./bidding service user --config configs/dev.bidding.yaml
+protoc --proto_path=.:$GOPATH/src --go_out=./internal --micro_out=./internal internal/user/user.proto && \ 
+./bidding service user --config configs/dev.bidding.yaml
 ```
 
 #### API Server
