@@ -2,9 +2,12 @@ package backend
 
 import (
 	"context"
+	"fmt"
+	"sellerapp-bidding-system/configs"
 	"sync"
 
 	log "github.com/micro/go-micro/v2/logger"
+	"github.com/spf13/viper"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -12,7 +15,16 @@ import (
 
 var connPool = sync.Pool{
 	New: func() interface{} {
-		db, err := sqlx.Connect("mysql", "root:RYEfc53!t9t@(localhost:3306)/bidding_app")
+
+		userName := viper.GetString(configs.MYSQL_USER)
+		password := viper.GetString(configs.MYSQL_PASSWORD)
+		port := viper.GetString(configs.MYSQL_PORT)
+		host := viper.GetString(configs.MYSQL_HOST)
+		dbName := viper.GetString(configs.MYSQL_DB)
+
+		url := fmt.Sprintf("%s:%s@(%s:%s)/%s", userName, password, host, port, dbName)
+
+		db, err := sqlx.Connect("mysql", url)
 		if err != nil {
 			return err
 		}

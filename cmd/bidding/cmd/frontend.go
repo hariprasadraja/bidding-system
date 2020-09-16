@@ -77,6 +77,7 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			log.Error("unable to start the service", err)
 		}
+
 	},
 }
 
