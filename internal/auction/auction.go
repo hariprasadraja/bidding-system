@@ -293,15 +293,19 @@ func (h *Handler) GetBids(ctx context.Context, db *sqlx.DB, auctionID int64) ([]
 	}
 
 	Bids := make([]*Bid, 0)
-	for rows.NextResultSet() && rows.Next() {
-		bid := Bid{}
-		err := rows.Scan(&bid.AuctionId, &bid.UserId, &bid.BidAmount)
-		if err != nil {
-			return nil, err
+	nextResultSet := true
+	for nextResultSet {
+		for rows.Next() {
+			bid := Bid{}
+			err := rows.Scan(&bid.AuctionId, &bid.UserId, &bid.BidAmount)
+			if err != nil {
+				return nil, err
+			}
+
+			Bids = append(Bids, &bid)
 		}
 
-		Bids = append(Bids, &bid)
+		nextResultSet = rows.NextResultSet()
 	}
-
 	return Bids, nil
 }
