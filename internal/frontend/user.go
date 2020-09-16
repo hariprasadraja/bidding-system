@@ -41,6 +41,7 @@ type Response struct {
 }
 
 func (u User) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	log.Info("create user called.")
 	userModel := model.User{}
 	err := json.NewDecoder(r.Body).Decode(&userModel)
 	if err != nil {
@@ -48,12 +49,16 @@ func (u User) Create(w http.ResponseWriter, r *http.Request, params httprouter.P
 		return
 	}
 
+	err = userModel.CreateValidate()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
 	userModel.Password, err = OneTimeEnc(userModel.Password)
 	if err != nil {
 		log.Error("login.password.enc ", err.Error())
 		return
 	}
-
 	resp, err := u.userService.Create(r.Context(), &user.CreateRequest{
 		Name:     userModel.Name,
 		Email:    userModel.Email,
@@ -71,6 +76,7 @@ func (u User) Create(w http.ResponseWriter, r *http.Request, params httprouter.P
 		StatusText: http.StatusText(http.StatusOK),
 		Status:     http.StatusOK,
 		Message:    resp.GetMsg(),
+		ID:         resp.GetId(),
 	})
 }
 
@@ -121,6 +127,11 @@ func (u User) Update(w http.ResponseWriter, r *http.Request, params httprouter.P
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	err = userModel.UpdateValidate()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	log.Info("user_details", userModel)
@@ -187,6 +198,7 @@ func (u User) Authenticate(w http.ResponseWriter, r *http.Request, params httpro
 		return
 	}
 
+	log.Info("passoword ", userModel.Password)
 	_, err = u.userService.Exist(r.Context(), &user.ExistRequest{
 		Email:    userModel.Email,
 		Password: userModel.Password,
@@ -206,12 +218,13 @@ func (u User) Authenticate(w http.ResponseWriter, r *http.Request, params httpro
 		return
 	}
 
+	userID := strconv.FormatInt(user.Id, 10)
 	token, err := EncJWT(AppJWTClaims{
 		Role: user.GetRole(),
 		Login: jwt.StandardClaims{
 			Audience:  userModel.Email,
 			ExpiresAt: time.Now().Add((24 * 30) * time.Hour).Unix(),
-			Id:        string(user.Id),
+			Id:        userID,
 			IssuedAt:  time.Now().Unix(),
 			Issuer:    "sellerapp.bidding.backend",
 			Subject:   "login token",

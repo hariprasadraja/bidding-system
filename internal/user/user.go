@@ -96,7 +96,18 @@ func (h *Handler) Delete(ctx context.Context, req *DeleteRequest, resp *DeleteRe
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
 
-	_, err := sq.ExecContextWith(ctx, db, sq.Delete("User").Where(sq.Eq{
+	row := db.QueryRow("SELECT EXISTS (SELECT * FROM `User` WHERE id= ?) AS 'count'", req.GetId())
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return errors.BadRequest("user.delete", "user does not exist")
+	}
+
+	_, err = sq.ExecContextWith(ctx, db, sq.Delete("User").Where(sq.Eq{
 		"id": req.GetId(),
 	}))
 
@@ -104,7 +115,6 @@ func (h *Handler) Delete(ctx context.Context, req *DeleteRequest, resp *DeleteRe
 		return err
 	}
 
-	log.Infof("updated user - %s", req.GetId)
 	resp.Msg = "user deleted successfully."
 	return nil
 }

@@ -36,7 +36,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// New Service
 		service := micro.NewService(
-			micro.Name("go.micro.service.auction"),
+			micro.Name("go.micro.server.auction"),
 			micro.Version("latest"),
 		)
 

@@ -23,7 +23,7 @@ var connPool = sync.Pool{
 		dbName := viper.GetString(configs.MYSQL_DB)
 
 		url := fmt.Sprintf("%s:%s@(%s:%s)/%s", userName, password, host, port, dbName)
-
+		log.Info("url ", url)
 		db, err := sqlx.Connect("mysql", url)
 		if err != nil {
 			return err

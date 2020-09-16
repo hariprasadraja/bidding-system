@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sellerapp-bidding-system/internal/model"
 	"sellerapp-bidding-system/internal/user"
+	"strconv"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
@@ -34,7 +35,25 @@ func (u *User) AllowAdmin(next httprouter.Handle) httprouter.Handle {
 			return
 		}
 
+		userID, err := strconv.ParseInt(claims.Login.Id, 10, 64)
+		if err != nil {
+			log.Error("invalid.user.token ", err, "login id", claims.Login.Id)
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return
+		}
+
+		// Verify user exist or not
+		_, err = u.userService.Get(r.Context(), &user.GetRequest{
+			Id: userID,
+		})
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		}
+
 		r.Header.Set(HeaderAdminID, claims.Login.Id)
+		next(w, r, params)
 	}
 }
 
@@ -50,6 +69,7 @@ func (u *User) AllowUser(next httprouter.Handle) httprouter.Handle {
 		if claims.Role != model.NormalUser {
 			log.Info("middleware.admin.invalid")
 			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return
 		}
 
 		err = claims.Login.Valid()
@@ -58,9 +78,17 @@ func (u *User) AllowUser(next httprouter.Handle) httprouter.Handle {
 			return
 		}
 
+		log.Info("login claims", claims.Login)
+		userID, err := strconv.ParseInt(claims.Login.Id, 10, 64)
+		if err != nil {
+			log.Error("invalid.user.token ", err, "login id", claims.Login.Id)
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return
+		}
+
 		// Verify user exist or not
-		_, err = u.userService.Exist(r.Context(), &user.ExistRequest{
-			Email: claims.Login.Audience,
+		_, err = u.userService.Get(r.Context(), &user.GetRequest{
+			Id: userID,
 		})
 
 		if err != nil {
@@ -69,6 +97,7 @@ func (u *User) AllowUser(next httprouter.Handle) httprouter.Handle {
 		}
 
 		r.Header.Set(HeaderAdminID, claims.Login.Id)
+		next(w, r, params)
 	}
 }
 
@@ -81,11 +110,6 @@ func (u *User) AllowAuction(next httprouter.Handle) httprouter.Handle {
 			return
 		}
 
-		if claims.Role != model.NormalUser {
-			log.Info("middleware.admin.invalid")
-			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
-		}
-
 		err = claims.Auctions.Valid()
 		if err != nil {
 			log.Error("error ", err)
@@ -93,6 +117,7 @@ func (u *User) AllowAuction(next httprouter.Handle) httprouter.Handle {
 		}
 
 		r.Header.Set(HeaderAuctionID, claims.Auctions.Id)
+		next(w, r, params)
 	}
 }
 

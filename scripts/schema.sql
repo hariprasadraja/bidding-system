@@ -21,15 +21,15 @@ CREATE TABLE `Auction` (
   `name` varchar(100) NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime NOT NULL,
-  `start_amount` bigint unsigned NOT NULL,
-  `end_amount` double NOT NULL,
+  `start_amount` float NULL,
+  `end_amount` float NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 -- Create a First Admin Role User  // password: 1234
 INSERT INTO bidding_app.`User` (name,`role`,email,password,date_created,date_modified) VALUES
-('hari prasad',0,'hariprasadmails@gmail.com','47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=','2020-09-13 15:29:42','2020-09-13 15:29:42')
+('hari prasad',0,'hariprasadmails@gmail.com','A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=','2020-09-13 15:29:42','2020-09-13 15:29:42')
 ;
 
 CREATE TABLE bidding_app.Bid (

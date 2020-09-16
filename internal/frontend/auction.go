@@ -14,15 +14,15 @@ import (
 	"github.com/micro/go-micro/v2/util/log"
 )
 
-const TimeFormat = "2006-01-02 15:04:05 MST"
-
 type Auction struct {
 	AuctionService auction.AuctionService
+	UserService    user.UserService
 }
 
 func RegisterAuctionRoutes(router *httprouter.Router, userService user.UserService, auctionService auction.AuctionService) {
 	auction := Auction{
 		AuctionService: auctionService,
+		UserService:    userService,
 	}
 
 	user := User{
@@ -33,12 +33,14 @@ func RegisterAuctionRoutes(router *httprouter.Router, userService user.UserServi
 	router.PUT("/auction", user.AllowAdmin(auction.Update))
 	router.DELETE("/auction", user.AllowAdmin(auction.Delete))
 	router.GET("/auction/status", user.AllowUser(auction.Status))
-	router.POST("/auction/raise_bid", user.AllowUser(auction.RaiseBid))
+	router.POST("/auction/raise_bid", user.AllowAuction(user.AllowUser(auction.RaiseBid)))
+	router.GET("/auction/all", user.AllowAdmin(auction.GetAll))
+	router.GET("/auction/live_only", user.AllowUser(auction.GetLiveOnly))
 	router.POST("/auction/join/:id", user.AllowUser(auction.RequestToJoin))
 
-	router.GET("/auctions/all", user.AllowAdmin(auction.GetAll))
-	router.GET("/auctions/live_only", user.AllowUser(auction.GetLiveOnly))
 }
+
+const TimeFormat = "2006-01-02 15:04:05"
 
 func (u Auction) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	auctionModel := model.Auction{}
@@ -48,10 +50,28 @@ func (u Auction) Create(w http.ResponseWriter, r *http.Request, params httproute
 		return
 	}
 
+	err = auctionModel.CreateValidate()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	startTime, err := time.Parse(TimeFormat+" MST", auctionModel.StartTime)
+	if err != nil {
+		http.Error(w, "start_time: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	endTime, err := time.Parse(TimeFormat+" MST", auctionModel.EndTime)
+	if err != nil {
+		http.Error(w, "end_time: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	resp, err := u.AuctionService.Create(r.Context(), &auction.AuctionRequest{
 		Name:        auctionModel.Name,
-		StartTime:   auctionModel.StartTime.UTC().String(),
-		EndTime:     auctionModel.EndTime.UTC().String(),
+		StartTime:   startTime.UTC().Format(TimeFormat),
+		EndTime:     endTime.UTC().Format(TimeFormat),
 		StartAmount: auctionModel.StartAmount,
 		Currency:    auctionModel.Currency,
 	})
@@ -78,11 +98,29 @@ func (u Auction) Update(w http.ResponseWriter, r *http.Request, params httproute
 		return
 	}
 
+	err = auctionModel.CreateValidate()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	startTime, err := time.Parse(TimeFormat+" MST", auctionModel.StartTime)
+	if err != nil {
+		http.Error(w, "start_time: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	endTime, err := time.Parse(TimeFormat+" MST", auctionModel.EndTime)
+	if err != nil {
+		http.Error(w, "start_time: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	resp, err := u.AuctionService.Update(r.Context(), &auction.AuctionRequest{
 		Id:          auctionModel.ID,
 		Name:        auctionModel.Name,
-		StartTime:   auctionModel.StartTime.UTC().String(),
-		EndTime:     auctionModel.EndTime.UTC().String(),
+		StartTime:   startTime.UTC().Format(TimeFormat),
+		EndTime:     endTime.UTC().Format(TimeFormat),
 		StartAmount: auctionModel.StartAmount,
 		Currency:    auctionModel.Currency,
 	})
@@ -205,14 +243,14 @@ func (u Auction) RequestToJoin(w http.ResponseWriter, r *http.Request, params ht
 		return
 	}
 
-	if time.Now().After(endTime) {
-		http.Error(w, "auction already ended.", http.StatusBadRequest)
+	now := time.Now().UTC()
+	if now.Before(startTime) {
+		http.Error(w, "auction not yet started.", http.StatusBadRequest)
 		return
 	}
 
-	adminID, err := strconv.ParseInt(r.Header.Get(HeaderAdminID), 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if now.Before(startTime) {
+		http.Error(w, "auction already done. item sold.", http.StatusBadRequest)
 		return
 	}
 
@@ -223,8 +261,9 @@ func (u Auction) RequestToJoin(w http.ResponseWriter, r *http.Request, params ht
 	}
 
 	claims.Auctions = jwt.StandardClaims{
+		//NOTE: set to local time, since claims.Valid() works on local time.
 		ExpiresAt: endTime.Unix(),
-		Id:        string(adminID),
+		Id:        auctionIDStr,
 		IssuedAt:  time.Now().Unix(),
 		Issuer:    r.URL.RequestURI(),
 		NotBefore: startTime.Unix(),

@@ -23,6 +23,7 @@ message Bid {
 	int64 auction_id = 1;
 	int64 user_id = 2;
   float bid_amount = 3;
+	string bid_amount_display = 4;
 }
 
 message AuctionRequest {

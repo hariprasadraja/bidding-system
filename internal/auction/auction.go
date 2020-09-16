@@ -8,11 +8,14 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
+	"github.com/leekchan/accounting"
 	"github.com/micro/go-micro/errors"
 	log "github.com/micro/go-micro/v2/logger"
 )
 
 type Handler struct{}
+
+const TimeFormat = "2006-01-02 15:04:05"
 
 func (h *Handler) Create(ctx context.Context, in *AuctionRequest, out *Response) error {
 	db := backend.GetConnection(ctx)
@@ -117,9 +120,9 @@ func (h *Handler) GetLive(ctx context.Context, in *NoRequest, out *All) error {
 	db := backend.GetConnection(ctx)
 	defer backend.PutConnection(db)
 
-	now := time.Now()
-	rows, err := sq.Select("id,name,start_time,end_time,start_amount").From("Auction").
-		Where("start_time >= ? AND end_time <= ?", now, now).
+	now := time.Now().UTC().Format(TimeFormat)
+	rows, err := sq.Select("id,name,start_time,end_time,start_amount,currency").From("Auction").
+		Where("start_time <= ? AND end_time >= ?", now, now).
 		RunWith(db).QueryContext(ctx)
 
 	if err != nil {
@@ -133,7 +136,7 @@ func (h *Handler) GetLive(ctx context.Context, in *NoRequest, out *All) error {
 	for nextResultSet {
 		for rows.Next() {
 			var auction AuctionRequest
-			err := rows.Scan(&auction.Id, &auction.Name, &auction.StartTime, &auction.EndTime, &auction.StartAmount)
+			err := rows.Scan(&auction.Id, &auction.Name, &auction.StartTime, &auction.EndTime, &auction.StartAmount, &auction.Currency)
 			if err != nil {
 				return err
 			}
@@ -143,7 +146,19 @@ func (h *Handler) GetLive(ctx context.Context, in *NoRequest, out *All) error {
 				return err
 			}
 
+			ac := accounting.Accounting{
+				Symbol:         auction.Currency,
+				Precision:      2,
+				Format:         "%s %v",
+				FormatNegative: "%s (%v)",
+			}
+
+			for i := range response.Bids {
+				response.Bids[i].BidAmountDisplay = ac.FormatMoney(response.Bids[i].GetBidAmount())
+			}
+
 			response.Auction = &auction
+			out.Auctions = append(out.Auctions, &response)
 		}
 
 		if err := rows.Err(); err != nil {
@@ -161,7 +176,7 @@ func (h *Handler) GetAll(ctx context.Context, in *NoRequest, out *All) error {
 	defer backend.PutConnection(db)
 
 	rows, err := sq.
-		Select("*").From("Auction").
+		Select("id,name,start_time,end_time,start_amount,currency").From("Auction").
 		RunWith(db).QueryContext(ctx)
 
 	if err != nil {
@@ -172,11 +187,10 @@ func (h *Handler) GetAll(ctx context.Context, in *NoRequest, out *All) error {
 	out.Auctions = make([]*GetResponse, 0)
 	var response GetResponse
 	var nextResultSet = true
-
 	for nextResultSet {
 		for rows.Next() {
 			var auction AuctionRequest
-			err := rows.Scan(&auction.Id, &auction.Name, &auction.StartTime, &auction.EndTime, &auction.StartAmount)
+			err := rows.Scan(&auction.Id, &auction.Name, &auction.StartTime, &auction.EndTime, &auction.StartAmount, &auction.Currency)
 			if err != nil {
 				return err
 			}
@@ -186,7 +200,20 @@ func (h *Handler) GetAll(ctx context.Context, in *NoRequest, out *All) error {
 				return err
 			}
 
+			ac := accounting.Accounting{
+				Symbol:         auction.Currency,
+				Precision:      2,
+				Format:         "%s %v",
+				FormatNegative: "%s (%v)",
+				FormatZero:     "%s --",
+			}
+
+			for i := range response.Bids {
+				response.Bids[i].BidAmountDisplay = ac.FormatMoney(response.Bids[i].GetBidAmount())
+			}
+
 			response.Auction = &auction
+			out.Auctions = append(out.Auctions, &response)
 		}
 
 		if err := rows.Err(); err != nil {
@@ -212,8 +239,15 @@ func (h *Handler) IncreaseBid(ctx context.Context, in *Bid, out *NoResponse) err
 		return errors.Timeout("auction.increase_bid.timeout", "auction is not in live.")
 	}
 
+	// delete the previous entry for the user in the auction
+	_, err = sq.Delete("Bid").Where("auction_id = ? AND user_id = ?", in.GetAuctionId(), in.GetUserId()).RunWith(db).ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	// insert the new update amount
 	_, err = sq.Insert("Bid").
-		Columns("auction_id", "user_id", "bid_amount").
+		Columns("auction_id", "user_id", "amount").
 		Values(in.GetAuctionId(), in.GetUserId(), in.GetBidAmount()).RunWith(db).ExecContext(ctx)
 
 	if err != nil {
@@ -231,8 +265,10 @@ func Close(closer io.Closer) {
 }
 
 func (h *Handler) IsLive(ctx context.Context, db *sqlx.DB, auctionID int64) (bool, error) {
-	now := time.Now()
-	row := db.QueryRow("SELECT EXISTS (SELECT * FROM `Auction` WHERE id= ? AND start_time >= ? AND end_time <= ?) AS 'count'", auctionID, now, now)
+	now := time.Now().UTC().Format(TimeFormat)
+
+	log.Info("now", now)
+	row := db.QueryRow("SELECT EXISTS (SELECT * FROM `Auction` WHERE id= ? AND start_time <= ? AND end_time >= ?) AS 'count'", auctionID, now, now)
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
@@ -249,7 +285,7 @@ func (h *Handler) IsLive(ctx context.Context, db *sqlx.DB, auctionID int64) (boo
 func (h *Handler) GetBids(ctx context.Context, db *sqlx.DB, auctionID int64) ([]*Bid, error) {
 	rows, err := sq.Select("*").From("Bid").Where(sq.Eq{
 		"auction_id": auctionID,
-	}).OrderBy("bid_amount").RunWith(db).QueryContext(ctx)
+	}).OrderBy("amount").RunWith(db).QueryContext(ctx)
 
 	if err != nil {
 		return nil, err
