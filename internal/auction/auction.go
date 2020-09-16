@@ -146,6 +146,7 @@ func (h *Handler) GetLive(ctx context.Context, in *NoRequest, out *All) error {
 				return err
 			}
 
+			log.Info("bids", response.Bids)
 			ac := accounting.Accounting{
 				Symbol:         auction.Currency,
 				Precision:      2,
