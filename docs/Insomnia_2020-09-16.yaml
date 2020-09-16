@@ -1,0 +1,545 @@
+_type: export
+__export_format: 4
+__export_date: 2020-09-16T13:11:16.494Z
+__export_source: insomnia.desktop.app:v2020.3.3
+resources:
+  - _id: req_83b1ce18c8f448e4b4263eb506c59d8a
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Yhx-A4li_T12Uocy.FZVsy_36G07fGjSWXw0cYDZIDz6IsgbmelSdDajcGfb3Gi869NGyfa9Gt5isLpVnsXiXHV8WtQZ8W9bPqZnM3E4fjRRR_utcH7-B2loi63rCh7SVvEzUbgLRSdM7cYHntPnnxF_hhP-ivITGRro-psGcazyjO2WmhERWEPNhZrHXy5zWHWLjWeIrH7LEho_Vtg0hUUvQK0ggiCtlr1qAz2CV.YyfWgYYTIPB3AqCcO-STRQ
+      type: bearer
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name":"auction1",
+        	"currency":"USD",
+        	"start_amount":100.00, 
+        	"start_time":"2020-09-16 10:00:00 IST",
+        	"end_time":"2020-09-17 10:00:00 IST"
+        }
+    created: 1600244629963
+    description: |
+      # Request 
+      ```
+      {
+      	"name":"auction1",
+      	"currency":"USD",
+      	"start_amount":100.00, 
+      	"start_time":"2020-09-16 10:00:00 IST",
+      	"end_time":"2020-09-17 10:00:00 IST"
+      }
+      ```
+      # Response 
+
+      ```
+      {
+        "id": 1,
+        "status": "Created",
+        "message": "auction created successfully."
+      }
+      ```
+    headers:
+      - id: pair_8f86bbf2337442dcaa8bbaa85e1e48db
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1600243428847
+    method: POST
+    modified: 1600250316806
+    name: Create Auction
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/auction
+    _type: request
+  - _id: fld_5b89c8108f104fd9a1e1df427e323ffb
+    created: 1597482108154
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1597482108155
+    modified: 1600173108684
+    name: SellerApp
+    parentId: wrk_f122ceb5f28c40f492098ed711b67d5d
+    _type: request_group
+  - _id: wrk_f122ceb5f28c40f492098ed711b67d5d
+    created: 1597480605946
+    description: ""
+    modified: 1597480605946
+    name: Insomnia
+    parentId: null
+    scope: null
+    _type: workspace
+  - _id: req_aee20f7a92a145949c3dfef86a8f3851
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Yhx-A4li_T12Uocy.FZVsy_36G07fGjSWXw0cYDZIDz6IsgbmelSdDajcGfb3Gi869NGyfa9Gt5isLpVnsXiXHV8WtQZ8W9bPqZnM3E4fjRRR_utcH7-B2loi63rCh7SVvEzUbgLRSdM7cYHntPnnxF_hhP-ivITGRro-psGcazyjO2WmhERWEPNhZrHXy5zWHWLjWeIrH7LEho_Vtg0hUUvQK0ggiCtlr1qAz2CV.YyfWgYYTIPB3AqCcO-STRQ
+      type: bearer
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"id":1,
+        	"name":"auction1",
+        	"currency":"USD",
+        	"start_amount":100.00, 
+        	"start_time":"2020-09-16 10:00:00 IST",
+        	"end_time":"2020-09-17 10:00:00 IST"
+        }
+    created: 1600249848668
+    description: |-
+      # Update Request 
+
+      ```
+      {
+      	"id":1,
+      	"name":"auction1",
+      	"currency":"USD",
+      	"start_amount":100.00, 
+      	"start_time":"2020-09-16 10:00:00 IST",
+      	"end_time":"2020-09-17 10:00:00 IST"
+      }
+
+      ```
+
+      # Response
+      ```
+      {
+        "status": "Created",
+        "message": "auction updated successfully."
+      }
+
+      ```
+    headers:
+      - id: pair_8f86bbf2337442dcaa8bbaa85e1e48db
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1600243428822
+    method: PUT
+    modified: 1600250266216
+    name: Update Auction
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/auction
+    _type: request
+  - _id: req_8a19e2c9ad3f4c9c88dec32b957bbb58
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..2WvwvKlwA-jZDQVQ.vAx0FdKMpQBrH4sfQLOCrqHY1LYm-oZLdcsXccvAv6s0U_-KuI0N2YrDo06xwMd_DhaGedl9W2Y_VRQ3aBvFYIXaoJSYAuNTG0V2OIzRoaTceUN5lYdkodba7ZhfjhsVSqhhqArYcYMz2BlUPHCeVoMjlZ2Jr2vAX3WMIstGlzAbGAdDM58FxBdwDaqaSKQijj6fvG6e4azWluHrCYRz3SsB.ftArQDrP5sf6U7AYUM9LTA
+      type: bearer
+    body:
+      mimeType: application/json
+      text: ""
+    created: 1600252412629
+    description: |-
+      # Update Request 
+
+      ```
+      {
+      	"id":1,
+      	"name":"auction1",
+      	"currency":"USD",
+      	"start_amount":100.00, 
+      	"start_time":"2020-09-16 10:00:00 IST",
+      	"end_time":"2020-09-17 10:00:00 IST"
+      }
+
+      ```
+
+      # Response
+      ```
+      {
+        "status": "Created",
+        "message": "auction updated successfully."
+      }
+
+      ```
+    headers:
+      - id: pair_8f86bbf2337442dcaa8bbaa85e1e48db
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1600243428809.5
+    method: POST
+    modified: 1600255941799
+    name: Join Auction
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/auction/join/1
+    _type: request
+  - _id: req_86149887cbc842bb89b996eb631b6461
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..XoprTh2jhcaOj_OF.ec9ThG52h-m2yoxRbDpdo4XfZhYzaZCQw4bWJfHFmRZSXAlIt3vIGNS80jU9Sk0wftjFjtPw165spZrUtRvMz5JuEAY9Ftfk_3-rNE87vRNAtyyAahGGEeL_ibq_7Kf-AUs7YYXvL8t1GK8WyWF_9lx4bJZjhu08Zp_zOvTnx9-xwS62y7nP62Caybj4JLnJWtmBzrBV6PSQQu71HqkSUyCcFeft1rOYmRXX_2l_tnBIOscp_FP9Gods7vUdm2AvWEZKMDKLBAVncxpL79ZbTUDOXaPah99T-3XXjoXTpLYqh8aVG63cI9R2tR3xioKKkJKoR-vigeUyeTu2tDX8VbCc2_LkHEt3hiigBg.-lYpyn1XX-PxrnjTH9MgXg
+      type: bearer
+    body:
+      mimeType: application/json
+      text: ""
+    created: 1600254965217
+    description: |-
+      # Update Request 
+
+      ```
+      {
+      	"id":1,
+      	"name":"auction1",
+      	"currency":"USD",
+      	"start_amount":100.00, 
+      	"start_time":"2020-09-16 10:00:00 IST",
+      	"end_time":"2020-09-17 10:00:00 IST"
+      }
+
+      ```
+
+      # Response
+      ```
+      {
+        "status": "Created",
+        "message": "auction updated successfully."
+      }
+
+      ```
+    headers:
+      - id: pair_8f86bbf2337442dcaa8bbaa85e1e48db
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1600243428803.25
+    method: POST
+    modified: 1600256951705
+    name: Raise Bid
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/auction/raise_bid?bid_amount=500
+    _type: request
+  - _id: req_d609896a8a31440bbcf2f8d229c408d1
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Yhx-A4li_T12Uocy.FZVsy_36G07fGjSWXw0cYDZIDz6IsgbmelSdDajcGfb3Gi869NGyfa9Gt5isLpVnsXiXHV8WtQZ8W9bPqZnM3E4fjRRR_utcH7-B2loi63rCh7SVvEzUbgLRSdM7cYHntPnnxF_hhP-ivITGRro-psGcazyjO2WmhERWEPNhZrHXy5zWHWLjWeIrH7LEho_Vtg0hUUvQK0ggiCtlr1qAz2CV.YyfWgYYTIPB3AqCcO-STRQ
+      type: bearer
+    body:
+      mimeType: application/json
+      text: ""
+    created: 1600243428797
+    description: ""
+    headers:
+      - id: pair_b0fa353cc8e24dba90647fd2ddeaba4e
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1600243428797
+    method: DELETE
+    modified: 1600243518733
+    name: DeleteUser
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/user?id=6
+    _type: request
+  - _id: req_343531c1b2484995a352c1cb98d98a05
+    authentication:
+      type: bearer
+    body:
+      mimeType: application/json
+      text: |
+        {
+        	"email":"hariprasad1@gmail.com",
+        	"password":"1234"
+        }
+    created: 1600172436978
+    description: |
+      # Request 
+      ```
+      {
+      	"email":"hariprasadmails@gmail.com",
+      	"password":"1234"
+      }
+
+      ```
+
+      # Response 
+      ```
+      {
+        "status": "OK",
+        "message": "loggedIn successfull",
+        "token": "jwe-token"
+      }
+      ```
+    headers:
+      - id: pair_5bd2609382784195a3b5ec74bdcc4f76
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1597482108155
+    method: POST
+    modified: 1600259571816
+    name: Login
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/authenticate
+    _type: request
+  - _id: req_3f8f9f234b69473d80fa704c6a5feb78
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Yhx-A4li_T12Uocy.FZVsy_36G07fGjSWXw0cYDZIDz6IsgbmelSdDajcGfb3Gi869NGyfa9Gt5isLpVnsXiXHV8WtQZ8W9bPqZnM3E4fjRRR_utcH7-B2loi63rCh7SVvEzUbgLRSdM7cYHntPnnxF_hhP-ivITGRro-psGcazyjO2WmhERWEPNhZrHXy5zWHWLjWeIrH7LEho_Vtg0hUUvQK0ggiCtlr1qAz2CV.YyfWgYYTIPB3AqCcO-STRQ
+      type: bearer
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name":"hari prasad",
+        	"email":"hariprasad1@gmail.com",
+        	"password":"1234"
+        }
+    created: 1597482098260
+    description: |-
+      # Create User Request 
+
+      ```
+      {
+      	"name":"hari prasad",
+      	"email":"hariprasad1@gmail.com",
+      	"password":"1234"
+      }
+      ```
+
+
+      # Response 
+
+      ```
+      {
+        "id": 7,
+        "status": "OK",
+        "message": "user created successfully."
+      }
+      ```
+    headers:
+      - id: pair_969b8363e4884cbaab877731a3cdaf76
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1597482108105
+    method: POST
+    modified: 1600243819188
+    name: Create User
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/user
+    _type: request
+  - _id: req_5b3f2da076ce4fab9c3e33c6463db337
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..HzA4ZjFCXPQo9j-z.EYHhoANBiaWVjGVvLdMrLRKfNvmZ8GrjkT3TD3PPzx4Vy7e0jGD_Bg_dC2cK5AAt2ffzxlV73zxXX99G7WLFraoIIKP8yHfA6t9k-iHih_AXlShRddQGcrKDyZYrfBrd1jcX7lVffuV-MDvzYWugtx3QUari7t7bFC3z6e0lBUO8nqNoOkx821KOYjaUGurqkh152ZwHx2uB27ca0Zvh.F4SYleU4bSCUiehQ2FakCg
+      type: bearer
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name":"hari prasad",
+        	"email":"hariprasad1@gmail.com",
+        	"password":"1234"
+        }
+    created: 1600257368796
+    description: |-
+      
+      # Response 
+
+      ```
+      {
+        "status": "OK",
+        "data": {
+          "auctions": [
+            {
+              "auction": {
+                "id": 1,
+                "name": "auction1",
+                "start_time": "2020-09-16 04:30:00",
+                "end_time": "2020-09-17 04:30:00",
+                "start_amount": 100,
+                "currency": "USD"
+              }
+            }
+          ]
+        }
+      }
+      ```
+    headers:
+      - id: pair_969b8363e4884cbaab877731a3cdaf76
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1597482108080
+    method: GET
+    modified: 1600259520927
+    name: All Auctions
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/auction/all
+    _type: request
+  - _id: req_59d5692569f249a398f153cbcccbd6db
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..CcHiU78C5VIk4e4K.bpT-ZAMN13W2871xcbFEPM0KTCvEdk2C8DBQ28GJbMfDeIb8u35XLstUHjR8QNo4PcLnHVchKfkNiyNtMhnDbFg8pIthMePQe5Vuf-tAWqCMVnDnz1jIGxyuEvpMIFK2XJ-4I34HTv2qiiYLyA1JZMSviaPD8i5sQem4Vm60GQ4Wme9MHQcNSk87gy5Koulo_-Y9s5_ZQe2DDT3JnURA9Wf9.5Y7HHX9iCrak6ntgEi1uqw
+      type: bearer
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name":"hari prasad",
+        	"email":"hariprasad1@gmail.com",
+        	"password":"1234"
+        }
+    created: 1600259537734
+    description: |-
+      
+      # Response 
+
+      ```
+      {
+        "status": "OK",
+        "data": {
+          "auctions": [
+            {
+              "auction": {
+                "id": 1,
+                "name": "auction1",
+                "start_time": "2020-09-16 04:30:00",
+                "end_time": "2020-09-17 04:30:00",
+                "start_amount": 100,
+                "currency": "USD"
+              }
+            }
+          ]
+        }
+      }
+      ```
+    headers:
+      - id: pair_969b8363e4884cbaab877731a3cdaf76
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1597482108067.5
+    method: GET
+    modified: 1600259589939
+    name: Only Live Auctions
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/auction/live_only
+    _type: request
+  - _id: req_ea6b5c0b564045709dd2c280c6ff837a
+    authentication:
+      token: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Yhx-A4li_T12Uocy.FZVsy_36G07fGjSWXw0cYDZIDz6IsgbmelSdDajcGfb3Gi869NGyfa9Gt5isLpVnsXiXHV8WtQZ8W9bPqZnM3E4fjRRR_utcH7-B2loi63rCh7SVvEzUbgLRSdM7cYHntPnnxF_hhP-ivITGRro-psGcazyjO2WmhERWEPNhZrHXy5zWHWLjWeIrH7LEho_Vtg0hUUvQK0ggiCtlr1qAz2CV.YyfWgYYTIPB3AqCcO-STRQ
+      type: bearer
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"id":1,
+        	"name":"hari prasad",
+        	"email":"hariprasadcsmails@gmail.com"
+        }
+    created: 1599997382251
+    description: |+
+      Update User Request 
+
+      ```
+      {
+      	"id":1,
+      	"name":"hari prasad",
+      	"email":"hariprasadcsmails@gmail.com"
+      }
+
+      ```
+
+
+    headers:
+      - id: pair_969b8363e4884cbaab877731a3cdaf76
+        name: Content-Type
+        value: application/json
+    isPrivate: false
+    metaSortKey: -1597482108055
+    method: PUT
+    modified: 1600243846620
+    name: Update User
+    parameters: []
+    parentId: fld_5b89c8108f104fd9a1e1df427e323ffb
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingFollowRedirects: global
+    settingRebuildPath: true
+    settingSendCookies: true
+    settingStoreCookies: true
+    url: http://127.0.0.1:8085/user
+    _type: request
+  - _id: env_fc245461cec9c0006f571bd89f830b676399aaf7
+    color: null
+    created: 1597480606128
+    data: {}
+    dataPropertyOrder: null
+    isPrivate: false
+    metaSortKey: 1597480606128
+    modified: 1597480606128
+    name: Base Environment
+    parentId: wrk_f122ceb5f28c40f492098ed711b67d5d
+    _type: environment
+  - _id: jar_fc245461cec9c0006f571bd89f830b676399aaf7
+    cookies: []
+    created: 1597480606133
+    modified: 1597480606133
+    name: Default Jar
+    parentId: wrk_f122ceb5f28c40f492098ed711b67d5d
+    _type: cookie_jar
+  - _id: spc_ed63f871627445769dc588cc94f5c71d
+    contentType: yaml
+    contents: ""
+    created: 1597480605950
+    fileName: Insomnia
+    modified: 1597480605950
+    parentId: wrk_f122ceb5f28c40f492098ed711b67d5d
+    _type: api_spec

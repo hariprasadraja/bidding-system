@@ -113,6 +113,17 @@ func (h *Handler) Get(ctx context.Context, in *GetRequest, out *GetResponse) err
 		return err
 	}
 
+	ac := accounting.Accounting{
+		Symbol:         out.Auction.Currency,
+		Precision:      2,
+		Format:         "%s %v",
+		FormatNegative: "%s (%v)",
+	}
+
+	for i := range out.Bids {
+		out.Bids[i].BidAmountDisplay = ac.FormatMoney(out.Bids[i].GetBidAmount())
+	}
+
 	return nil
 }
 
