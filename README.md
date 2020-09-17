@@ -5,7 +5,9 @@ A Simple Auction Management System
 ## Dependencies
 
 Go Version: 1.14
+
 Database: MYSQL 8
+
 Micro Framework - https://github.com/micro/micro (Version 2)
 
 ## Build
