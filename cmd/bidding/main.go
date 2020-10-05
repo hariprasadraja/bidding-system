@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "sellerapp-bidding-system/cmd/bidding/cmd"
+import "bidding-system/cmd/bidding/cmd"
 
 func main() {
 	cmd.Execute()

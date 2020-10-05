@@ -1,9 +1,9 @@
 package auction
 
 import (
+	"bidding-system/internal/backend"
 	"context"
 	"io"
-	"sellerapp-bidding-system/internal/backend"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"

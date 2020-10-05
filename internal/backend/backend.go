@@ -1,9 +1,9 @@
 package backend
 
 import (
+	"bidding-system/configs"
 	"context"
 	"fmt"
-	"sellerapp-bidding-system/configs"
 	"sync"
 
 	log "github.com/micro/go-micro/v2/logger"

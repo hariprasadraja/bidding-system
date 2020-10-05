@@ -1,4 +1,4 @@
-module sellerapp-bidding-system
+module bidding-system
 
 go 1.14
 

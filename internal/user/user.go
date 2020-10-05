@@ -1,8 +1,8 @@
 package user
 
 import (
+	"bidding-system/internal/backend"
 	context "context"
-	"sellerapp-bidding-system/internal/backend"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"

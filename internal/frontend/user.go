@@ -1,10 +1,10 @@
 package frontend
 
 import (
+	"bidding-system/internal/model"
+	"bidding-system/internal/user"
 	"encoding/json"
 	"net/http"
-	"sellerapp-bidding-system/internal/model"
-	"sellerapp-bidding-system/internal/user"
 	"strconv"
 	"time"
 
